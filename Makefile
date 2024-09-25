@@ -7,6 +7,7 @@ ENV_FILE:=.env
 APP_PORT:=8000
 DATABASE_BIND_PATH:=./lancedb
 REGION:=ap-southeast-2
+MODEL_ID:=anthropic.claude-3-sonnet-20240229-v1:0
 
 # build and run this service only
 .PHONY: build
@@ -22,6 +23,7 @@ env:
 	@echo "APP_PORT=$(APP_PORT)"> $(ENV_FILE)
 	@echo "DATABASE_BIND_PATH=$(DATABASE_BIND_PATH)">> $(ENV_FILE)
 	@echo "REGION=$(REGION)">> $(ENV_FILE)
+	@echo "MODEL_ID=$(MODEL_ID)">> $(ENV_FILE)
 
 #  normal build & up
 .PHONY: compose-build

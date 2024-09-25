@@ -14,14 +14,12 @@
 // limitations under the License.
 
 import { Router } from "express";
-import { chatCompletion, ragChatCompletion } from "../actions/inference.js";
-import { isRouteEnabled } from "../tools/enabledApiDecoder.js";
+import { chatCompletion } from "../actions/inference.js";
 
 export default function inferenceRoute() {
     const router = Router();
 
-    isRouteEnabled("inference", "completions") && router.post('/completions', chatCompletion);
-    isRouteEnabled("inference", "rag") && router.post('/rag-completions', ragChatCompletion);
+    router.post('/completions', chatCompletion);
 
     return router;
 }

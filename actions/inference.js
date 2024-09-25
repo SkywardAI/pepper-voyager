@@ -112,6 +112,11 @@ function retrieveData(req_header, req_body) {
         return { error: true, status: 422, message: "Messages not given!" }
     }
 
+    // format what AWS Bedrock SDK can recognize
+    messages = messages.map(({role, content})=>{
+        return { role, content: [{text: content}] }
+    })
+
     // apply n_predict value
     if(!max_tokens) max_tokens = 128;
     request_body.n_predict = max_tokens;
@@ -148,37 +153,37 @@ export async function chatCompletion(req, res) {
     const { api_key, model, system_fingerprint, request_body, messages } = body
     const isStream = !!request_body.stream;
 
-    if(+process.env.ENABLE_PLUGIN) {
-        const latest_message = messages.filter(e=>e.role === 'user').pop()
-        const { type, value } = await userMessageHandler({
-            "message": latest_message ? latest_message.content : "",
-            "full_hisoty": messages
-        });
+    // if(+process.env.ENABLE_PLUGIN) {
+    //     const latest_message = messages.filter(e=>e.role === 'user').pop()
+    //     const { type, value } = await userMessageHandler({
+    //         "message": latest_message ? latest_message.content : "",
+    //         "full_hisoty": messages
+    //     });
 
-        switch(type) {
-            case "error":
-                res.status(403).send(value);
-                return;
-            case "replace_resp":
-                res.send(generateResponseContent(
-                    api_key, 'chat.completion', model, system_fingerprint,
-                    isStream, value, true
-                ));
-                return;
-            case "history":
-                request_body.prompt = formatOpenAIContext(value);
-                break;
-            case "system_instruction":
-                messages.push({role:"system", content: value});
-                break;
-            case "normal": default:
-                break;
-        }
-    }
+    //     switch(type) {
+    //         case "error":
+    //             res.status(403).send(value);
+    //             return;
+    //         case "replace_resp":
+    //             res.send(generateResponseContent(
+    //                 api_key, 'chat.completion', model, system_fingerprint,
+    //                 isStream, value, true
+    //             ));
+    //             return;
+    //         case "history":
+    //             request_body.prompt = formatOpenAIContext(value);
+    //             break;
+    //         case "system_instruction":
+    //             messages.push({role:"system", content: value});
+    //             break;
+    //         case "normal": default:
+    //             break;
+    //     }
+    // }
 
-    if(!request_body.prompt) {
-        request_body.prompt = formatOpenAIContext(messages);
-    }
+    // if(!request_body.prompt) {
+    //     request_body.prompt = formatOpenAIContext(messages);
+    // }
 
     if(isStream) {
         res.setHeader("Content-Type", "text/event-stream");

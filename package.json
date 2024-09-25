@@ -5,8 +5,8 @@
   "description": "OpenAI like APIs",
   "main": "index.js",
   "scripts": {
-    "start": "node --disable-warning=ExperimentalWarning index.js",
-    "dev": "nodemon --disable-warning=ExperimentalWarning index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "lint": "npx eslint .",
     "build": "npm install && node index.js"
   },
@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.658.0",
     "@babel/eslint-parser": "^7.25.1",
     "@babel/plugin-syntax-import-attributes": "^7.24.7",
     "@eslint/js": "^9.8.0",
@@ -24,9 +25,6 @@
     "dotenv": "^16.4.5",
     "eslint": "^9.8.0",
     "express": "^4.19.2",
-    "globals": "^15.8.0",
-    "prom-client": "12",
-    "swagger-stats": "^0.99.7",
-    "swagger-ui-express": "^5.0.1"
+    "globals": "^15.8.0"
   }
 }

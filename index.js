@@ -19,47 +19,28 @@ import bodyParser from 'body-parser';
 import { createServer } from "https"
 import { configDotenv } from 'dotenv';
 
-import { initDB } from './database/index.js';
+// import { initDB } from './database/index.js';
 import buildRoutes from './routes/index.js'
 
-import swStats from 'swagger-stats';
-import * as swaggerUi from 'swagger-ui-express'
-import swaggerSpec from "./swagger.json" with { type: "json" };
-import { decodeEnabledAPIs, isRouteEnabled } from './tools/enabledApiDecoder.js';
-import { loadDefaultDataset } from './tools/plugin.js';
-import { loadDataset } from './database/rag-inference.js';
+// import { loadDefaultDataset } from './tools/plugin.js';
+// import { loadDataset } from './database/rag-inference.js';
 import { readFileSync } from 'fs';
 
 configDotenv()
 configDotenv({path: ".env.production", override:true})
-decodeEnabledAPIs();
 
-const force_load = false;
-await initDB(force_load)
-if(+process.env.LOAD_DEFAULT_DATASET) {
-    const loader = await loadDataset(process.env.DEFAULT_DATASET_NAME || "production_dataset", force_load)
-    loader && await loader(await loadDefaultDataset())
-}
+// const force_load = false;
+// await initDB(force_load)
+// if(+process.env.LOAD_DEFAULT_DATASET) {
+//     const loader = await loadDataset(process.env.DEFAULT_DATASET_NAME || "production_dataset", force_load)
+//     loader && await loader(await loadDefaultDataset())
+// }
 
 const app = express();
 app.use(cors({origin: process.env.ALLOW_ORIGIN || '*'}));
 app.use(bodyParser.json());
 
-if(isRouteEnabled("index", "stats")) {
-    app.use(swStats.getMiddleware({
-        name: "Voyager Swagger Monitor",
-        uriPath: '/stats',
-        swaggerSpec
-    }))
-}
-
 buildRoutes(app);
-
-if(isRouteEnabled("index", "docs")) {
-    app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-        customSiteTitle: "Voyager APIs"
-    }))
-}
 
 const PORT = process.env.PORT || 8000
 if(

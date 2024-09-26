@@ -7,8 +7,7 @@ services:
       context: .
     volumes:
       - .:/app
-      - ${DATABASE_BIND_PATH}:/tmp/lancedb
     expose:
       - ${APP_PORT}
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - ${EXPOST_PORT}:${APP_PORT}

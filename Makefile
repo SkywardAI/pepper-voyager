@@ -5,6 +5,7 @@ CONTAINER_NAME:=voyager:v0.2.0
 ENV_FILE:=.env
 
 APP_PORT:=8000
+EXPOST_PORT:=80
 DATABASE_BIND_PATH:=./lancedb
 REGION:=ap-southeast-2
 MODEL_ID:=anthropic.claude-3-sonnet-20240229-v1:0
@@ -21,6 +22,8 @@ run: build
 .PHONY: env
 env:
 	@echo "APP_PORT=$(APP_PORT)"> $(ENV_FILE)
+	@echo "EXPOST_PORT=$(EXPOST_PORT)">> $(ENV_FILE)
+	@echo "PROJECT_NAME=$(PROJECT_NAME)">> $(ENV_FILE)
 	@echo "DATABASE_BIND_PATH=$(DATABASE_BIND_PATH)">> $(ENV_FILE)
 	@echo "REGION=$(REGION)">> $(ENV_FILE)
 	@echo "MODEL_ID=$(MODEL_ID)">> $(ENV_FILE)

@@ -42,7 +42,7 @@ app.use(bodyParser.json());
 
 buildRoutes(app);
 
-const PORT = process.env.PORT || 8000
+const PORT = process.env.APP_PORT || 8000
 if(
     +process.env.ENABLE_HTTPS &&
     !process.env.HTTPS_KEY_PATH.startsWith("*") &&

@@ -68,14 +68,19 @@ export async function inference(messages, settings, cb = null) {
     const response = await client.send(command);
 
     let response_text;
-    for await (const resp of response.stream) {
-        if(resp.contentBlockDelta) {
-            text_piece = resp.contentBlockDelta.delta.text;
-            response_text += text_piece;
-            cb && cb(text_piece, false);
+    if(settings.stream) {
+        for await (const resp of response.stream) {
+            if(resp.contentBlockDelta) {
+                const text_piece = resp.contentBlockDelta.delta.text;
+                response_text += text_piece;
+                cb && cb(text_piece, false);
+            }
         }
+        cb && cb('', true)
+    } else {
+        response_text = response.output.message.content[0].text;
+        cb && cb(response_text, true)
     }
-    cb && cb('', true)
 
     return response_text;
 }

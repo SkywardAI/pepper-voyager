@@ -27,7 +27,7 @@ export function rebuildBedrockClient() {
 
 /**
  * @typedef Message
- * @property {"user"|"assistant"} role
+ * @property {"user"|"assistant"|"system"} role
  * @property {MessageContent[]} content
  */
 
@@ -49,17 +49,30 @@ export function rebuildBedrockClient() {
 export async function inference(messages, settings, cb = null) {
     if(!client) rebuildBedrockClient();
 
+    const normal_messages = [];
+    const system_messages = [];
+    messages.forEach(e=>{
+        const {role, content} = e;
+        if(role === 'assistant' || role === 'user') {
+            normal_messages.push(e)
+        } else if(role === 'system') {
+            system_messages.push(content[0])
+        }
+    })
+
     const { top_p, temperature, max_tokens } = settings;
 
     const input = {
         modelId: process.env.MODEL_ID || 'anthropic.claude-3-sonnet-20240229-v1:0',
-        messages,
+        messages: normal_messages,
         inferenceConfig: {
             maxTokens: max_tokens || 2048,
             temperature: temperature || 0.7, 
             topP: top_p || 0.9
         }
     }
+
+    if(system_messages.length) input.system = system_messages
 
     let command;
     if(settings.stream) command = new ConverseStreamCommand(input);

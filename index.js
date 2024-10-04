@@ -28,6 +28,7 @@ import { readFileSync } from 'fs';
 
 configDotenv()
 configDotenv({path: ".env.production", override:true})
+configDotenv({path: ".env.azure"})
 
 // const force_load = false;
 // await initDB(force_load)

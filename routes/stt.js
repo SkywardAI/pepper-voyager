@@ -1,4 +1,4 @@
-import STT from "../actions/azure-speech";
+import STT from "../actions/azure-speech.js";
 import bodyParser from 'body-parser';
 
 /**
@@ -18,7 +18,7 @@ import { Router } from "express";
 export default function speechRoute() {
     const router = Router();
     
-    router.post('/recognition', bodyParser.raw({ type: 'audio/wav' }), SpeechToText);
+    router.post('/recognition', bodyParser.raw({ type: 'audio/wav', limit: '10mb' }), SpeechToText);
 
     return router;
 }

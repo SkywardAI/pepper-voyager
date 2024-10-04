@@ -16,6 +16,7 @@
 import { Router } from "express";
 
 import inferenceRoute from "./inference.js";
+import speechRoute from "./stt.js";
 
 function indexRoute() {
     const router = Router();
@@ -30,6 +31,7 @@ function indexRoute() {
 function generateAPIRouters() {
     const api_router = Router();
     api_router.use('/chat', inferenceRoute());
+    api_router.use('/speech', speechRoute())
     return api_router;
 }
 

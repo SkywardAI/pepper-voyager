@@ -11,10 +11,8 @@ export default function STT(buffer) {
         const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
         recognizer.recognizeOnceAsync(result => {
             const t = result.text
-            console.log(`Recognized: ${t}`);
             resolve({text: t})
         }, err => {
-            console.error('Error:', err);
             resolve({error: err})
         });
     })

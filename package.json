@@ -25,6 +25,7 @@
     "dotenv": "^16.4.5",
     "eslint": "^9.8.0",
     "express": "^4.19.2",
-    "globals": "^15.8.0"
+    "globals": "^15.8.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.40.0"
   }
 }

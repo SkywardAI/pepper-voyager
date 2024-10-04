@@ -13,6 +13,7 @@ export default function STT(buffer) {
         const speechConfig = sdk.SpeechConfig.fromSubscription(
             process.env.AZURE_SPEECH_KEY, process.env.AZURE_SPEECH_REGION
         );
+        speechConfig.speechRecognitionLanguage = 'en-us'
         const audioConfig =  sdk.AudioConfig.fromStreamInput(bufferToReadable(buffer));
     
         const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);

@@ -1,5 +1,16 @@
 import {default as sdk} from 'microsoft-cognitiveservices-speech-sdk'
 
+/**
+ * @typedef RecognitionResult
+ * @property {String|undefined} text The recoginition result if was success
+ * @property {Error|undefined} err The error object if there's any error occurs
+ */
+
+/**
+ * The method doing stt using azure speech service
+ * @param {Buffer} buffer the audio buffer extracted from type `audio/wav`
+ * @returns {RecognitionResult}
+ */
 export default function STT(buffer) {
     return new Promise(resolve=>{
         const audioConfig =  sdk.AudioConfig.fromWavFileInput(buffer);

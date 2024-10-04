@@ -3,8 +3,8 @@ import bodyParser from 'body-parser';
 
 /**
  * call speech to text service on azure
- * @param {Request} req 
- * @param {Response} res 
+ * @param {Request} req
+ * @param {Response} res
  */
 async function SpeechToText(req, res) {
     const buffer = req.body;

@@ -16,7 +16,7 @@
 import { Router } from "express";
 
 import inferenceRoute from "./inference.js";
-import speechRoute from "./stt.js";
+import speechRoute from "./speech.js";
 
 function indexRoute() {
     const router = Router();

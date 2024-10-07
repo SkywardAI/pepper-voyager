@@ -14,6 +14,7 @@
 // limitations under the License.
 
 import { BedrockRuntimeClient, ConverseCommand, ConverseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
+import { readdir, readFile } from 'fs/promises'
 
 /**
  * @type { BedrockRuntimeClient? }
@@ -63,6 +64,30 @@ export function rebuildBedrockClient() {
  */
 export async function inference(messages, settings, cb = null) {
     if(!client) rebuildBedrockClient();
+
+    if(process.env.LOAD_SRC && messages.findIndex(({role})=>role === 'assistant') === -1) {
+        const idx = messages.findIndex(({role})=>role === 'user');
+        const base_url = import.meta.url;
+        try {
+            const files = (
+                await readdir(new URL('./src', base_url))
+            // max 5 files in a bedrock conversation
+            ).slice(0, 5)
+            for(const f of files) {
+                const parts = f.split('.')
+                const extension = parts.pop();
+                const file_name = parts.join('_')
+                const file_buffer = await readFile(new URL(`./src/${f}`, base_url))
+                messages[idx].content.push({ 
+                    format: extension.toLowerCase(), 
+                    name: file_name, 
+                    source: {bytes: file_buffer} 
+                })
+            }
+        } catch(error) {
+            console.error(error)
+        }
+    }
 
     const normal_messages = [];
     const system_messages = [];

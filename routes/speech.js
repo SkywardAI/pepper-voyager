@@ -15,6 +15,9 @@
 
 import STT from "../actions/azure-speech.js";
 import bodyParser from 'body-parser';
+import { Router } from "express";
+import { extractAPIKeyFromRequest, validateAPIKey } from "../tools/apiKey.js";
+
 
 /**
  * call speech to text service on azure
@@ -22,14 +25,15 @@ import bodyParser from 'body-parser';
  * @param {Response} res
  */
 async function SpeechToText(req, res) {
+    if(!validateAPIKey(extractAPIKeyFromRequest(req))) {
+        res.status(401).send('Not Authorized')
+        return;
+    }
     const buffer = req.body;
     const resp = await STT(buffer);
     res.setHeader('Content-Type', 'application/json')
     res.send(resp)
 }
-
-import { Router } from "express";
-
 export default function speechRoute() {
     const router = Router();
     

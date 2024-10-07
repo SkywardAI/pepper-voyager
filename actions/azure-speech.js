@@ -24,7 +24,7 @@ import {default as sdk} from 'microsoft-cognitiveservices-speech-sdk'
 /**
  * The method doing stt using azure speech service
  * @param {Buffer} buffer the audio buffer extracted from type `audio/wav`
- * @returns {RecognitionResult}
+ * @returns {Promise<RecognitionResult>}
  */
 export default function STT(buffer) {
     return new Promise(resolve=>{

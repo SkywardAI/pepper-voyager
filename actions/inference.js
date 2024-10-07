@@ -18,8 +18,8 @@ import { generateFingerprint } from "../tools/generator.js";
 // import { post } from "../tools/request.js";
 // import { searchByMessage } from "../database/rag-inference.js";
 // import { userMessageHandler } from "../tools/plugin.js";
-import { extractAPIKeyFromHeader, validateAPIKey } from "../tools/apiKey.js";
-import { inference } from "./bedrock.js";
+import { extractAPIKeyFromHeader, extractAPIKeyFromRequest, validateAPIKey } from "../tools/apiKey.js";
+import { inference, rebuildBedrockClient } from "./bedrock.js";
 
 /**
  * Generates a response content object for chat completion.
@@ -139,4 +139,15 @@ export async function chatCompletion(req, res) {
             ))
         }
     })
+}
+
+// no need currently
+export async function resetChat(req, res) {
+    if(!validateAPIKey(extractAPIKeyFromRequest(req))) {
+        res.status(401).send('Not Authorized')
+        return;
+    }
+
+	rebuildBedrockClient();
+	res.status(200).send({status:'ok'})
 }

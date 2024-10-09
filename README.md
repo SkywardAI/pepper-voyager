@@ -76,6 +76,8 @@ Content-Type: application/json
   }
 }
 ```
+#### Notes
+If the request messages contains only `user` and `system`, the code treats the messages as new conversation and will rebuild the AWS Bedrock Client.
 ### Speech Recognition
 #### Route
 `/v1/speech/recognition`

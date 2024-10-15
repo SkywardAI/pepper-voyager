@@ -94,9 +94,13 @@ export async function inference(messages, settings, cb = null) {
 
     const normal_messages = [];
     const system_messages = [];
+
+    let last_role;
     messages.forEach(e=>{
         const {role, content} = e;
-        if(role === 'assistant' || role === 'user') {
+        if(/^(user|assistant)$/.test(role)) {
+            role === last_role && normal_messages.pop();
+            last_role = role;
             normal_messages.push(e)
         } else if(role === 'system') {
             system_messages.push(content[0])

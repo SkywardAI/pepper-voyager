@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { BedrockAgentRuntimeClient, RetrieveCommand } from "@aws-sdk/client-bedrock-agent-runtime";
 import { BedrockRuntimeClient, ConverseCommand, ConverseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
-import { readdir, readFile } from 'fs/promises'
 
 /**
  * @type { BedrockRuntimeClient? }
@@ -22,12 +22,40 @@ import { readdir, readFile } from 'fs/promises'
 let client = null;
 
 /**
+ * @type { BedrockAgentRuntimeClient? }
+ */
+let agent_client = null;
+
+/**
+ * Get result from knowledge base, send together witht the LLM inference
+ * @param {String} message the message to be sent to knowledge-base query
+ * @returns {Promise<String>}
+ */
+async function invokeKnowledgeBase(message) {
+    const input = {
+        knowledgeBaseId: process.env.KNOWLEDGE_BASE_ID,
+        retrievalQuery: {
+            text: message
+        },
+        retrievalConfiguration: {
+            vectorSearchConfiguration: {
+                numberOfResults: 2,
+            }
+        }
+    }
+
+    const retrieval_command = new RetrieveCommand(input);
+    const kb_resp = await agent_client.send(retrieval_command);
+    return JSON.stringify(kb_resp)
+}
+
+/**
  * Initialize or Re-initialize the bedrock runtime client in given region.
  */
 export function rebuildBedrockClient() {
-    client = new BedrockRuntimeClient({
-        region: process.env.REGION || 'ap-southeast-2'
-    })
+    const region = process.env.REGION || 'ap-southeast-2'
+    client = new BedrockRuntimeClient({region})
+    agent_client = new BedrockAgentRuntimeClient({region})
 }
 
 /**
@@ -67,29 +95,6 @@ export async function inference(messages, settings, cb = null) {
 
     if(messages.findIndex(({role})=>role === 'assistant') === -1) {
         rebuildBedrockClient();
-        if(process.env.LOAD_SRC) {
-            const idx = messages.findIndex(({role})=>role === 'user');
-            const base_url = import.meta.url;
-            try {
-                const files = (
-                    await readdir(new URL('./src', base_url))
-                // max 5 files in a bedrock conversation
-                ).slice(0, 5)
-                for(const f of files) {
-                    const parts = f.split('.')
-                    const extension = parts.pop();
-                    const file_name = parts.join('_')
-                    const file_buffer = await readFile(new URL(`./src/${f}`, base_url))
-                    messages[idx].content.push({ 
-                        format: extension.toLowerCase(), 
-                        name: file_name, 
-                        source: {bytes: file_buffer} 
-                    })
-                }
-            } catch(error) {
-                console.error(error)
-            }
-        }
     }
 
     const normal_messages = [];
@@ -106,6 +111,12 @@ export async function inference(messages, settings, cb = null) {
             system_messages.push(content[0])
         }
     })
+
+    // add knowledge base result
+    if(process.env.INVOKE_KB && process.env.KNOWLEDGE_BASE_ID) {
+        const kb_resp_content = await invokeKnowledgeBase(messages.pop().content[0].text);
+        normal_messages[normal_messages.length - 1].content.unshift({ text: kb_resp_content })
+    }
 
     const { top_p, temperature, max_tokens } = settings;
 

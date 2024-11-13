@@ -53,9 +53,8 @@ async function invokeKnowledgeBase(message) {
  * Initialize or Re-initialize the bedrock runtime client in given region.
  */
 export function rebuildBedrockClient() {
-    const region = process.env.REGION || 'ap-southeast-2'
-    client = new BedrockRuntimeClient({region})
-    agent_client = new BedrockAgentRuntimeClient({region})
+    client = new BedrockRuntimeClient({region: process.env.REGION || 'ap-southeast-2'})
+    agent_client = new BedrockAgentRuntimeClient({region: process.env.KB_REGION || 'ap-southeast-2'})
 }
 
 /**
